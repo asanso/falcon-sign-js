@@ -36,6 +36,8 @@
 *.i*86
 *.x86_64
 *.hex
+kernel/n3_v1/falcon/test_prng
+kernel/n3_v1/falcon/test_falcon
 
 # Debug files
 *.dSYM/
@@ -92,7 +94,7 @@ CMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
-Makefile
+# Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -253,3 +255,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# vscode
+.vscode

@@ -36,7 +36,7 @@ crypto_sign_keypair(unsigned char *pk, unsigned char *sk)
 	TEMPALLOC int8_t f[512], g[512], F[512];
 	TEMPALLOC uint16_t h[512];
 	TEMPALLOC unsigned char seed[48];
-	TEMPALLOC inner_shake256_context rng;
+	TEMPALLOC inner_prng_context rng;
 	size_t u, v;
 
 
@@ -44,9 +44,9 @@ crypto_sign_keypair(unsigned char *pk, unsigned char *sk)
 	 * Generate key pair.
 	 */
 	randombytes(seed, sizeof seed);
-	inner_shake256_init(&rng);
-	inner_shake256_inject(&rng, seed, sizeof seed);
-	inner_shake256_flip(&rng);
+	inner_prng_init(&rng);
+	inner_prng_inject(&rng, seed, sizeof seed);
+	inner_prng_flip(&rng);
 	Zf(keygen)(&rng, f, g, F, NULL, h, 9, tmp.b);
 
 
@@ -106,7 +106,7 @@ crypto_sign(unsigned char *sm, unsigned long long *smlen,
 	} r;
 	TEMPALLOC unsigned char seed[48], nonce[NONCELEN];
 	TEMPALLOC unsigned char esig[CRYPTO_BYTES - 2 - sizeof nonce];
-	TEMPALLOC inner_shake256_context sc;
+	TEMPALLOC inner_prng_context sc;
 	size_t u, v, sig_len;
 
 	/*
@@ -149,19 +149,19 @@ crypto_sign(unsigned char *sm, unsigned long long *smlen,
 	/*
 	 * Hash message nonce + message into a vector.
 	 */
-	inner_shake256_init(&sc);
-	inner_shake256_inject(&sc, nonce, sizeof nonce);
-	inner_shake256_inject(&sc, m, mlen);
-	inner_shake256_flip(&sc);
+	inner_prng_init(&sc);
+	inner_prng_inject(&sc, nonce, sizeof nonce);
+	inner_prng_inject(&sc, m, mlen);
+	inner_prng_flip(&sc);
 	Zf(hash_to_point_vartime)(&sc, r.hm, 9);
 
 	/*
 	 * Initialize a RNG.
 	 */
 	randombytes(seed, sizeof seed);
-	inner_shake256_init(&sc);
-	inner_shake256_inject(&sc, seed, sizeof seed);
-	inner_shake256_flip(&sc);
+	inner_prng_init(&sc);
+	inner_prng_inject(&sc, seed, sizeof seed);
+	inner_prng_flip(&sc);
 
 
 	/*
@@ -205,7 +205,7 @@ crypto_sign_open(unsigned char *m, unsigned long long *mlen,
 	const unsigned char *esig;
 	TEMPALLOC uint16_t h[512], hm[512];
 	TEMPALLOC int16_t sig[512];
-	TEMPALLOC inner_shake256_context sc;
+	TEMPALLOC inner_prng_context sc;
 	size_t sig_len, msg_len;
 
 	/*
@@ -249,9 +249,9 @@ crypto_sign_open(unsigned char *m, unsigned long long *mlen,
 	/*
 	 * Hash nonce + message into a vector.
 	 */
-	inner_shake256_init(&sc);
-	inner_shake256_inject(&sc, sm + 2, NONCELEN + msg_len);
-	inner_shake256_flip(&sc);
+	inner_prng_init(&sc);
+	inner_prng_inject(&sc, sm + 2, NONCELEN + msg_len);
+	inner_prng_flip(&sc);
 	Zf(hash_to_point_vartime)(&sc, hm, 9);
 
 	/*

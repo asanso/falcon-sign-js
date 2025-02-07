@@ -486,7 +486,7 @@ process_block(uint64_t *A)
 
 /* see inner.h */
 void
-Zf(i_shake256_init)(inner_shake256_context *sc)
+Zf(i_shake256_init)(inner_prng_context *sc)
 {
 	sc->dptr = 0;
 
@@ -499,7 +499,7 @@ Zf(i_shake256_init)(inner_shake256_context *sc)
 
 /* see inner.h */
 void
-Zf(i_shake256_inject)(inner_shake256_context *sc, const uint8_t *in, size_t len)
+Zf(i_shake256_inject)(inner_prng_context *sc, const uint8_t *in, size_t len)
 {
 	size_t dptr;
 
@@ -530,7 +530,7 @@ Zf(i_shake256_inject)(inner_shake256_context *sc, const uint8_t *in, size_t len)
 
 /* see falcon.h */
 void
-Zf(i_shake256_flip)(inner_shake256_context *sc)
+Zf(i_shake256_flip)(inner_prng_context *sc)
 {
 	/*
 	 * We apply padding and pre-XOR the value into the state. We
