@@ -57,16 +57,16 @@ bool falconGenkey(uint8_t *genKeySeed, uint8_t *pk, uint8_t *sk)
 
 	int8_t f[FALCONLEN], g[FALCONLEN], F[FALCONLEN];
 	uint16_t h[FALCONLEN];
-	inner_shake256_context rng;
+	inner_prng_context rng;
 	size_t u, v;
 
 	/*
 	 * Generate key pair.
 	 */
 	// randombytes(seed, sizeof seed);
-	inner_shake256_init(&rng);
-	inner_shake256_inject(&rng, genKeySeed, SEEDLEN);
-	inner_shake256_flip(&rng);
+	inner_prng_init(&rng);
+	inner_prng_inject(&rng, genKeySeed, SEEDLEN);
+	inner_prng_flip(&rng);
 
 	Zf(keygen)(&rng, f, g, F, NULL, h, FALCONLOGLEN, tmp.b);
 	/*
@@ -182,7 +182,7 @@ bool falconSign(uint8_t *sm, uint8_t *m, const uint8_t *sk, uint8_t *salt)
 	unsigned char* seed = salt;
 	unsigned char* nonce = salt + SEEDLEN;
 	unsigned char esig[CRYPTO_BYTES - 2 - NONCELEN];
-	inner_shake256_context sc;
+	inner_prng_context sc;
 	size_t u, v, sig_len;
 
 	//little-endian 8 byte
@@ -231,19 +231,19 @@ bool falconSign(uint8_t *sm, uint8_t *m, const uint8_t *sk, uint8_t *salt)
 	/*
 	 * Hash message nonce + message into a vector.
 	 */
-	inner_shake256_init(&sc);
-	inner_shake256_inject(&sc, nonce, NONCELEN);
-	inner_shake256_inject(&sc, m, mlen);
-	inner_shake256_flip(&sc);
+	inner_prng_init(&sc);
+	inner_prng_inject(&sc, nonce, NONCELEN);
+	inner_prng_inject(&sc, m, mlen);
+	inner_prng_flip(&sc);
 	Zf(hash_to_point_vartime)(&sc, r.hm, FALCONLOGLEN);
 
 	/*
 	 * Initialize a RNG.
 	 */
 	// randombytes(seed, sizeof seed); The random bytes are modified to be generated externally.
-	inner_shake256_init(&sc);
-	inner_shake256_inject(&sc, seed, SEEDLEN);
-	inner_shake256_flip(&sc);
+	inner_prng_init(&sc);
+	inner_prng_inject(&sc, seed, SEEDLEN);
+	inner_prng_flip(&sc);
 	
 	/*
 	 * Compute the signature.
@@ -283,7 +283,7 @@ bool falconVerify(uint8_t *sm, uint8_t *m, const uint8_t *pk)
 	const unsigned char *esig;
 	uint16_t h[FALCONLEN], hm[FALCONLEN];
 	int16_t sig[FALCONLEN];
-	inner_shake256_context sc;
+	inner_prng_context sc;
 	uint16_t sig_len;
 
 	//little-endian 8 byte
@@ -325,10 +325,10 @@ bool falconVerify(uint8_t *sm, uint8_t *m, const uint8_t *pk)
 	/*
 	 * Hash nonce + message into a vector.
 	 */
-	inner_shake256_init(&sc);
-	inner_shake256_inject(&sc, sm + 2, NONCELEN);
-	inner_shake256_inject(&sc, m, msg_len);
-	inner_shake256_flip(&sc);
+	inner_prng_init(&sc);
+	inner_prng_inject(&sc, sm + 2, NONCELEN);
+	inner_prng_inject(&sc, m, msg_len);
+	inner_prng_flip(&sc);
 	Zf(hash_to_point_vartime)(&sc, hm, FALCONLOGLEN);
 
 	/*

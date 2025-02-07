@@ -36,7 +36,7 @@
 
 /* see inner.h */
 void
-Zf(prng_init)(prng *p, inner_shake256_context *src)
+Zf(prng_init)(prng *p, inner_prng_context *src)
 {
 	/*
 	 * To ensure reproducibility for a given seed, we
@@ -47,7 +47,7 @@ Zf(prng_init)(prng *p, inner_shake256_context *src)
 	uint64_t th, tl;
 	int i;
 
-	inner_shake256_extract(src, tmp, 56);
+	inner_prng_extract(src, tmp, 56);
 	for (i = 0; i < 14; i ++) {
 		uint32_t w;
 

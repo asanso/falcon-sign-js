@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "compare": "c",
+        "inner.h": "c",
+        "keccak256.h": "c"
+    }
+}
