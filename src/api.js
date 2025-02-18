@@ -90,7 +90,7 @@ function api(kernel, algid)
 			{
 				throw new Error(`sk must be ${kernel._getSkByte()} bytes`);
 			}
-			if(salt.length !== kernel._getCryptoSaltByte())
+			if(salt.length !==20)
 			{
 				throw new Error(`salt must be ${kernel._getCryptoSaltByte()} bytes`);
 			}
